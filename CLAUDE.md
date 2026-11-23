@@ -29,6 +29,18 @@ npm --prefix frontend run typecheck   # kiểm tra type frontend
 - Tài khoản web: `admin@ehrm.local` / `Admin@123` (thêm `binh.tran@ehrm.local` HR, `cuong.le@ehrm.local` MANAGER, cùng mật khẩu)
 - pgAdmin: `admin@ehrm.com` / `admin123`, host DB `postgres`, user `ehrm` / `ehrm123`
 
+## Quy trình Git (bắt buộc)
+
+Repo: `github.com/lequy1108/Rio-eHRM`, nhánh chính `main`. Chi tiết cho người: `CONTRIBUTING.md`.
+
+- **Không bao giờ commit thẳng lên `main`.** Mỗi việc một nhánh tạo từ `main` mới nhất: `feat/…`, `fix/…`, `refactor/…`, `chore/…`, `docs/…` (chữ thường không dấu, gạch ngang).
+- Bắt đầu việc: kiểm tra `git status` sạch, `git switch main`, tạo nhánh. Nếu đang có thay đổi chưa commit của người dùng thì hỏi trước, không tự stash/xoá.
+- Commit theo Conventional Commits, mô tả tiếng Việt: `feat(employees): thêm tab người phụ thuộc`. Commit nhỏ theo từng ý; chạy `lint`/`typecheck` trước khi commit.
+- Claude commit trong máy ảo (device_bash) với danh tính chủ repo: `git -c user.name="Rioedev" -c user.email="lequy11082003@gmail.com" commit …`. Claude không có quyền đẩy lên GitHub: khi xong, đưa cho người dùng lệnh `git push -u origin <nhánh>` và nội dung PR theo `.github/pull_request_template.md`.
+- PR merge bằng **Squash and merge** sau khi CI (`.github/workflows/ci.yml`) xanh. Sau merge: `git switch main && git pull`, xoá nhánh cũ.
+- Xong một giai đoạn trong `ROADMAP.md` thì gắn tag SemVer (`v0.3.0`…) và tạo Release.
+- Không commit `.env*` (trừ `.env.example`), `uploads/`, `dist/`, `.next/`, `node_modules/`.
+
 ## Backend – quy ước
 
 - Mỗi nghiệp vụ là một module trong `src/modules/<tên>/` gồm: `entities/`, `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`. Thêm module mới vào `app.module.ts`.
