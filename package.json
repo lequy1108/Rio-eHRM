@@ -1,0 +1,17 @@
+{
+  "name": "ehrm",
+  "private": true,
+  "scripts": {
+    "setup:env": "node scripts/setup-env.cjs",
+    "install:all": "npm run setup:env && npm install && npm --prefix backend install && npm --prefix frontend install",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "seed": "npm --prefix backend run seed",
+    "dev:api": "npm --prefix backend run start:dev",
+    "dev:web": "npm --prefix frontend run dev",
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

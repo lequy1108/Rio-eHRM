@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.next/
+out/
+coverage/
+uploads/
+.env
+.env.local
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.env.*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+.claude/settings.local.json
