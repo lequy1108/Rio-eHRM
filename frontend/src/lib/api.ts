@@ -129,3 +129,20 @@ export function fileUrl(path?: string | null) {
   if (/^https?:\/\//.test(path)) return path;
   return API_URL.replace(/\/api\/?$/, '') + path;
 }
+
+/**
+ * Mở file cần đăng nhập (tài liệu hồ sơ) trong tab mới. Mở tab trước khi tải để không bị chặn popup.
+ */
+export async function openFile(path: string) {
+  const win = window.open('', '_blank');
+  try {
+    const blob = await (await request(path)).blob();
+    const url = URL.createObjectURL(blob);
+    if (win) win.location.href = url;
+    else window.location.href = url;
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (e) {
+    win?.close();
+    throw e;
+  }
+}

@@ -83,6 +83,10 @@ export class EmployeeSettings {
   @apply(...intRange(0, 23, 'Giờ gửi nhắc'))
   reminderHour!: number;
 
+  /** Nhắc chứng chỉ sắp hết hạn trước bao nhiêu ngày; 0 = không nhắc */
+  @apply(...intRange(0, 180, 'Số ngày nhắc chứng chỉ'))
+  certificateRemindDays!: number;
+
   @apply(...intRange(1, 20, 'Dung lượng ảnh đại diện'))
   avatarMaxMB!: number;
 
@@ -168,6 +172,7 @@ export const SETTING_DEFAULTS: SettingsMap = {
     probationMonths: 2,
     probationRemindDays: 7,
     reminderHour: 8,
+    certificateRemindDays: 30,
     avatarMaxMB: 2,
     defaultNationality: 'Việt Nam',
   },

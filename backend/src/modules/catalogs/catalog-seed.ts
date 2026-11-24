@@ -13,6 +13,9 @@ const ETHNICITIES = [
 
 const RELIGIONS = ['Không', 'Phật giáo', 'Công giáo', 'Tin Lành', 'Cao Đài', 'Phật giáo Hoà Hảo', 'Hồi giáo', 'Khác'];
 
+/** Loại tài liệu trong hồ sơ nhân viên */
+const DOCUMENT_TYPES = ['Sơ yếu lý lịch / CV', 'Căn cước công dân', 'Bằng cấp, chứng chỉ', 'Giấy khám sức khoẻ', 'Sổ hộ khẩu / xác nhận cư trú', 'Ảnh 3x4', 'Hợp đồng, quyết định', 'Khác'];
+
 const EDUCATION = ['Trung học cơ sở', 'Trung học phổ thông', 'Trung cấp', 'Cao đẳng', 'Đại học', 'Thạc sĩ', 'Tiến sĩ', 'Khác'];
 
 /** 34 đơn vị hành chính cấp tỉnh từ 01/07/2025 (Nghị quyết 202/2025/QH15) */
@@ -77,4 +80,5 @@ export const CATALOG_SEED: Record<CatalogType, Seed[]> = {
   [CatalogType.EDUCATION]: fromNames(EDUCATION),
   [CatalogType.PROVINCE]: fromNames(PROVINCES),
   [CatalogType.BANK]: BANKS,
+  [CatalogType.DOCUMENT_TYPE]: fromNames(DOCUMENT_TYPES),
 };

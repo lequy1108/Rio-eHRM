@@ -18,13 +18,16 @@ import { useConfirm } from '@/providers/confirm-provider';
 import { EmployeeBadge } from '../_components/employee-badge';
 import { EmployeeFormDialog } from '../_components/employee-form-dialog';
 import { formatCustomValue, groupBySection, useCustomFields } from '@/lib/custom-fields';
+import { CareerTab } from './_components/career-tab';
+import { CompetenceTab } from './_components/competence-tab';
 import { CustomFieldsDialog } from './_components/custom-fields-dialog';
+import { DocumentsTab } from './_components/documents-tab';
 import { DependentsTab } from './_components/dependents-tab';
 import { HistoryTab } from './_components/history-tab';
 import { Info, Section } from './_components/section';
 import { SectionDialogs, type SectionKey } from './_components/section-dialogs';
 
-const TABS = ['overview', 'personal', 'finance', 'dependents', 'history'] as const;
+const TABS = ['overview', 'personal', 'competence', 'career', 'finance', 'dependents', 'documents', 'history'] as const;
 type Tab = (typeof TABS)[number];
 
 export default function EmployeeDetailPage() {
@@ -38,13 +41,16 @@ export default function EmployeeDetailPage() {
   const canEdit = can('employees.update');
   const canDelete = can('employees.delete');
   const canSensitive = can('employees.sensitive');
+  const canDocuments = can('employees.documents');
   const { data: customFields = [] } = useCustomFields();
   const [customSection, setCustomSection] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [section, setSection] = useState<SectionKey | null>(null);
 
   // Tab lưu trên URL (?tab=) để F5 hay gửi link vẫn mở đúng tab
-  const visible = TABS.filter((t) => canSensitive || (t !== 'finance' && t !== 'dependents'));
+  const visible = TABS.filter(
+    (t) => (canSensitive || (t !== 'finance' && t !== 'dependents')) && (canDocuments || t !== 'documents'),
+  );
   const raw = params.get('tab') as Tab | null;
   const tab: Tab = raw && visible.includes(raw) ? raw : 'overview';
   const setTab = (t: string) => {
@@ -132,8 +138,11 @@ export default function EmployeeDetailPage() {
               <TabsList>
                 <TabsTrigger value="overview">Tổng quan</TabsTrigger>
                 <TabsTrigger value="personal">Cá nhân</TabsTrigger>
+                <TabsTrigger value="competence">Năng lực</TabsTrigger>
+                <TabsTrigger value="career">Công tác</TabsTrigger>
                 {canSensitive && <TabsTrigger value="finance">Thuế · Ngân hàng</TabsTrigger>}
                 {canSensitive && <TabsTrigger value="dependents">Người phụ thuộc</TabsTrigger>}
+                {canDocuments && <TabsTrigger value="documents">Tài liệu</TabsTrigger>}
                 <TabsTrigger value="history">Lịch sử</TabsTrigger>
                 <TabsTrigger value="contract" disabled>
                   Hợp đồng
@@ -260,6 +269,20 @@ export default function EmployeeDetailPage() {
             {canSensitive && (
               <TabsContent value="dependents">
                 <DependentsTab employeeId={e.id} canEdit={canEdit} />
+              </TabsContent>
+            )}
+
+            <TabsContent value="competence">
+              <CompetenceTab employeeId={e.id} canEdit={canEdit} />
+            </TabsContent>
+
+            <TabsContent value="career">
+              <CareerTab employee={e} canEdit={canEdit} />
+            </TabsContent>
+
+            {canDocuments && (
+              <TabsContent value="documents">
+                <DocumentsTab employeeId={e.id} canEdit={canEdit} />
               </TabsContent>
             )}
 

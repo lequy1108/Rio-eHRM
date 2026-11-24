@@ -79,6 +79,13 @@ export class EmployeesController {
     return res;
   }
 
+  /** Sinh nhật, kỷ niệm ngày vào làm sắp tới (cho bảng điều khiển) */
+  @Get('upcoming-events')
+  @Permissions('employees.view')
+  upcomingEvents(@Query('days', new DefaultValuePipe(30), ParseIntPipe) days: number) {
+    return this.service.upcomingEvents(Math.min(Math.max(days, 1), 366));
+  }
+
   @Get('stats')
   @Permissions('employees.view')
   stats() {

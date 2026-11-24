@@ -15,6 +15,7 @@ import { GENDER_LABEL, type EmployeeStats, type EmployeeStatus } from '@/lib/typ
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/providers/auth-provider';
 import { HeadcountChart, type TrendPoint } from './_components/headcount-chart';
+import { UpcomingEvents } from './_components/upcoming-events';
 
 /** Thẻ số liệu: nhãn, con số, và so sánh với mốc cụ thể */
 function Stat({ label, value, note, href }: { label: string; value?: number; note?: string; href?: string }) {
@@ -167,7 +168,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <Card className="xl:col-span-3">
+        <Card className="xl:col-span-2">
           <CardHeader className="flex-row items-center justify-between">
             <CardTitle>Vào làm gần đây</CardTitle>
             <Button asChild variant="link" size="sm" className="h-auto p-0">
@@ -199,6 +200,8 @@ export default function DashboardPage() {
                 ))}
           </CardContent>
         </Card>
+
+        <UpcomingEvents />
       </div>
     </>
   );

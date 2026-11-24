@@ -41,6 +41,37 @@ export enum CatalogType {
   EDUCATION = 'EDUCATION', // Trình độ học vấn
   BANK = 'BANK', // Ngân hàng
   PROVINCE = 'PROVINCE', // Tỉnh/thành phố
+  DOCUMENT_TYPE = 'DOCUMENT_TYPE', // Loại tài liệu hồ sơ
+}
+
+export enum QualificationKind {
+  DEGREE = 'DEGREE', // Bằng cấp
+  CERTIFICATE = 'CERTIFICATE', // Chứng chỉ
+}
+
+export enum SkillKind {
+  SKILL = 'SKILL',
+  LANGUAGE = 'LANGUAGE',
+}
+
+export enum RewardKind {
+  REWARD = 'REWARD', // Khen thưởng
+  DISCIPLINE = 'DISCIPLINE', // Kỷ luật
+}
+
+/** Loại biến động công tác */
+export enum WorkChangeType {
+  TRANSFER = 'TRANSFER', // Điều chuyển
+  PROMOTION = 'PROMOTION', // Thăng chức
+  APPOINTMENT = 'APPOINTMENT', // Bổ nhiệm
+  DISMISSAL = 'DISMISSAL', // Miễn nhiệm
+  DEMOTION = 'DEMOTION', // Giáng chức
+  OTHER = 'OTHER',
+}
+
+export enum WorkChangeStatus {
+  PENDING = 'PENDING', // Chờ đến ngày hiệu lực
+  APPLIED = 'APPLIED', // Đã áp dụng vào hồ sơ
 }
 
 export enum AuditAction {

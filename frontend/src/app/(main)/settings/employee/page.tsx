@@ -18,6 +18,7 @@ const schema = z.object({
   probationMonths: int(0, 12, 'Số tháng'),
   probationRemindDays: int(0, 60, 'Số ngày'),
   reminderHour: int(0, 23, 'Giờ'),
+  certificateRemindDays: int(0, 180, 'Số ngày'),
   avatarMaxMB: int(1, 20, 'Dung lượng'),
   defaultNationality: z.string().trim().max(100),
 });
@@ -64,8 +65,14 @@ export default function EmployeeSettingsPage() {
           <FormField label="Nhắc trước (ngày)" htmlFor="probationRemindDays" error={errors.probationRemindDays?.message} hint="0 = không nhắc">
             <Input id="probationRemindDays" type="number" min={0} max={60} aria-invalid={!!errors.probationRemindDays} {...register('probationRemindDays')} />
           </FormField>
-          <FormField label="Giờ gửi nhắc hằng ngày" error={errors.reminderHour?.message} hint="Giờ Việt Nam">
+          <FormField label="Giờ gửi nhắc hằng ngày" error={errors.reminderHour?.message} hint="Giờ Việt Nam, dùng chung cho mọi email nhắc">
             <Select value={String(watch('reminderHour') ?? '')} onChange={(v) => setValue('reminderHour', v, { shouldDirty: true })} options={HOURS} />
+          </FormField>
+        </SettingsCard>
+
+        <SettingsCard title="Chứng chỉ" description="Nhắc khi chứng chỉ của nhân viên sắp hết hạn: đúng mốc này, mốc 7 ngày và ngày hết hạn" loading={isLoading} className="sm:grid-cols-3">
+          <FormField label="Nhắc trước (ngày)" htmlFor="certificateRemindDays" error={errors.certificateRemindDays?.message} hint="0 = không nhắc">
+            <Input id="certificateRemindDays" type="number" min={0} max={180} aria-invalid={!!errors.certificateRemindDays} {...register('certificateRemindDays')} />
           </FormField>
         </SettingsCard>
 

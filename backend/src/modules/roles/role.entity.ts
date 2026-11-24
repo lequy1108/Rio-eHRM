@@ -18,6 +18,13 @@ export class AppRole extends BaseEntity {
   @Column({ type: 'jsonb', default: [] })
   permissions!: string[];
 
+  /**
+   * Các mã quyền đã tồn tại lần cuối vai trò được lưu/kiểm tra. Quyền mới thêm vào hệ thống sau đó
+   * sẽ tự được cấp cho vai trò hệ thống nếu nằm trong mặc định (xem ensureSystemRoles)
+   */
+  @Column({ type: 'jsonb', nullable: true })
+  knownPermissions?: string[] | null;
+
   /** Vai trò có sẵn, không xoá được */
   @Column({ default: false })
   isSystem!: boolean;
