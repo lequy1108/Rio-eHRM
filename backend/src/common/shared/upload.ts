@@ -5,8 +5,11 @@ import { mkdirSync } from 'fs';
 import { diskStorage, memoryStorage } from 'multer';
 import { extname, join } from 'path';
 
-/** Thư mục gốc lưu file, phục vụ tĩnh tại /uploads */
+/** Thư mục gốc lưu file, phục vụ tĩnh tại /uploads (ai có link cũng xem được: chỉ để ảnh đại diện, logo) */
 export const UPLOAD_ROOT = join(process.cwd(), process.env.UPLOAD_DIR ?? 'uploads');
+
+/** Thư mục lưu file riêng tư (CCCD, hợp đồng…): KHÔNG phục vụ tĩnh, chỉ tải qua API có kiểm tra quyền */
+export const PRIVATE_ROOT = join(process.cwd(), process.env.PRIVATE_UPLOAD_DIR ?? 'storage');
 
 export const FILE_TYPES = {
   image: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
@@ -21,6 +24,9 @@ export const FILE_TYPES = {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'image/jpeg',
     'image/png',
+    'image/webp',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   ],
 };
 
@@ -29,13 +35,14 @@ export const FILE_TYPES = {
  *   @UseInterceptors(FileInterceptor('file', uploadOptions({ folder: 'avatars', types: FILE_TYPES.image, maxSizeMB: 2 })))
  * Không truyền folder = giữ file trong bộ nhớ (dùng cho import Excel).
  */
-export function uploadOptions(opts: { folder?: string; types?: string[]; maxSizeMB?: number }): MulterOptions {
+export function uploadOptions(opts: { folder?: string; types?: string[]; maxSizeMB?: number; private?: boolean }): MulterOptions {
   const { folder, types, maxSizeMB = 5 } = opts;
+  const root = opts.private ? PRIVATE_ROOT : UPLOAD_ROOT;
   return {
     storage: folder
       ? diskStorage({
           destination: (_req, _file, cb) => {
-            const dir = join(UPLOAD_ROOT, folder);
+            const dir = join(root, folder);
             mkdirSync(dir, { recursive: true });
             cb(null, dir);
           },

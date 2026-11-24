@@ -2,7 +2,7 @@ export type Gender = 'MALE' | 'FEMALE' | 'OTHER';
 export type EmployeeStatus = 'PROBATION' | 'ACTIVE' | 'ON_LEAVE' | 'RESIGNED';
 export type MaritalStatus = 'SINGLE' | 'MARRIED' | 'DIVORCED' | 'WIDOWED';
 export type DependentRelation = 'CHILD' | 'SPOUSE' | 'FATHER' | 'MOTHER' | 'OTHER';
-export type CatalogType = 'ETHNICITY' | 'RELIGION' | 'EDUCATION' | 'BANK' | 'PROVINCE';
+export type CatalogType = 'ETHNICITY' | 'RELIGION' | 'EDUCATION' | 'BANK' | 'PROVINCE' | 'DOCUMENT_TYPE';
 
 interface Base {
   id: string;
@@ -124,6 +124,106 @@ export interface PublicSettings {
   password: { minLength: number; requireUpper: boolean; requireNumber: boolean; requireSymbol: boolean };
 }
 
+/* ---------- Hồ sơ đợt 2: năng lực, công tác, tài liệu ---------- */
+
+export interface EmployeeChild extends Base {
+  employeeId: string;
+}
+
+export interface Qualification extends EmployeeChild {
+  kind: 'DEGREE' | 'CERTIFICATE';
+  name: string;
+  educationLevelId?: string | null;
+  educationLevel?: CatalogItem | null;
+  major?: string | null;
+  institution?: string | null;
+  grade?: string | null;
+  certificateNumber?: string | null;
+  issueDate?: string | null;
+  expiryDate?: string | null;
+  note?: string | null;
+}
+
+export interface Experience extends EmployeeChild {
+  companyName: string;
+  position?: string | null;
+  fromDate?: string | null;
+  toDate?: string | null;
+  description?: string | null;
+  reference?: string | null;
+}
+
+export interface Skill extends EmployeeChild {
+  kind: 'SKILL' | 'LANGUAGE';
+  name: string;
+  level?: number | null;
+  note?: string | null;
+}
+
+export interface Reward extends EmployeeChild {
+  kind: 'REWARD' | 'DISCIPLINE';
+  title: string;
+  form?: string | null;
+  decisionNumber?: string | null;
+  decisionDate: string;
+  amount?: number | null;
+  reason?: string | null;
+}
+
+export interface EmployeeDocument extends EmployeeChild {
+  categoryId?: string | null;
+  category?: CatalogItem | null;
+  name: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  note?: string | null;
+}
+
+export type WorkChangeType = 'TRANSFER' | 'PROMOTION' | 'APPOINTMENT' | 'DISMISSAL' | 'DEMOTION' | 'OTHER';
+
+export interface WorkHistory extends EmployeeChild {
+  type: WorkChangeType;
+  effectiveDate: string;
+  decisionNumber?: string | null;
+  status: 'PENDING' | 'APPLIED';
+  appliedAt?: string | null;
+  fromDepartmentId?: string | null;
+  toDepartmentId?: string | null;
+  fromPositionId?: string | null;
+  toPositionId?: string | null;
+  fromManagerId?: string | null;
+  toManagerId?: string | null;
+  fromDepartment?: Department | null;
+  toDepartment?: Department | null;
+  fromPosition?: Position | null;
+  toPosition?: Position | null;
+  fromManager?: Employee | null;
+  toManager?: Employee | null;
+  note?: string | null;
+}
+
+export interface UpcomingEvent {
+  type: 'BIRTHDAY' | 'ANNIVERSARY';
+  date: string;
+  inDays: number;
+  years: number;
+  employee: Pick<Employee, 'id' | 'code' | 'fullName' | 'avatarUrl' | 'department'>;
+}
+
+export const QUALIFICATION_KIND_LABEL = { DEGREE: 'Bằng cấp', CERTIFICATE: 'Chứng chỉ' } as const;
+export const SKILL_KIND_LABEL = { SKILL: 'Kỹ năng', LANGUAGE: 'Ngoại ngữ' } as const;
+export const REWARD_KIND_LABEL = { REWARD: 'Khen thưởng', DISCIPLINE: 'Kỷ luật' } as const;
+export const WORK_CHANGE_LABEL: Record<WorkChangeType, string> = {
+  TRANSFER: 'Điều chuyển',
+  PROMOTION: 'Thăng chức',
+  APPOINTMENT: 'Bổ nhiệm',
+  DISMISSAL: 'Miễn nhiệm',
+  DEMOTION: 'Giáng chức',
+  OTHER: 'Khác',
+};
+export const SKILL_LEVEL_LABEL = ['', 'Cơ bản', 'Trung bình', 'Khá', 'Tốt', 'Thành thạo'];
+
 export interface Dependent extends Base {
   employeeId: string;
   fullName: string;
@@ -237,6 +337,7 @@ export const CATALOG_TYPE_LABEL: Record<CatalogType, string> = {
   EDUCATION: 'Trình độ học vấn',
   BANK: 'Ngân hàng',
   PROVINCE: 'Tỉnh/thành phố',
+  DOCUMENT_TYPE: 'Loại tài liệu',
 };
 
 /** Nhãn tiếng Việt cho các trường trong lịch sử thay đổi */
@@ -278,6 +379,33 @@ export const FIELD_LABEL: Record<string, string> = {
   deductionFrom: 'Giảm trừ từ',
   deductionTo: 'Giảm trừ đến',
   note: 'Ghi chú',
+  kind: 'Loại',
+  name: 'Tên',
+  major: 'Chuyên ngành',
+  institution: 'Nơi cấp',
+  grade: 'Xếp loại',
+  certificateNumber: 'Số hiệu',
+  issueDate: 'Ngày cấp',
+  expiryDate: 'Ngày hết hạn',
+  companyName: 'Công ty',
+  fromDate: 'Từ ngày',
+  toDate: 'Đến ngày',
+  description: 'Mô tả',
+  reference: 'Người tham chiếu',
+  level: 'Mức độ',
+  title: 'Nội dung',
+  form: 'Hình thức',
+  decisionNumber: 'Số quyết định',
+  decisionDate: 'Ngày quyết định',
+  amount: 'Số tiền',
+  reason: 'Lý do',
+  category: 'Loại tài liệu',
+  fileName: 'File',
+  type: 'Loại',
+  effectiveDate: 'Ngày hiệu lực',
+  toDepartment: 'Phòng ban mới',
+  toPosition: 'Chức vụ mới',
+  toManager: 'Quản lý mới',
 };
 
 

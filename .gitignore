@@ -4,6 +4,7 @@ dist/
 out/
 coverage/
 uploads/
+storage/
 .env
 .env.local
 *.log

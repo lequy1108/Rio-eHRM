@@ -8,6 +8,7 @@ import { MailService } from '../../common/shared/mail.service';
 import { SettingsService } from '../settings/settings.service';
 import { User } from '../users/entities/user.entity';
 import { Employee } from './entities/employee.entity';
+import { EmployeeQualification } from './profile/profile.entities';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -23,12 +24,51 @@ export class EmployeesScheduler {
     @InjectRepository(User) private readonly users: Repository<User>,
     private readonly mail: MailService,
     private readonly settings: SettingsService,
+    @InjectRepository(EmployeeQualification) private readonly qualifications: Repository<EmployeeQualification>,
   ) {}
 
   /** Chạy đầu mỗi giờ, chỉ gửi khi đúng giờ nhắc trong Cài đặt → Quy tắc nhân sự */
   @Cron('0 * * * *', { name: 'probation-reminder', timeZone: 'Asia/Ho_Chi_Minh' })
   async tick() {
-    if (vnHour() === this.settings.get('employee').reminderHour) await this.remindProbationEnding();
+    if (vnHour() === this.settings.get('employee').reminderHour) {
+      await this.remindProbationEnding();
+      await this.remindCertificatesExpiring();
+    }
+  }
+
+  private async hrRecipients() {
+    return (await this.users.find({ where: { isActive: true } }))
+      .filter((u) => hasPermission(u.role?.permissions, 'employees.update'))
+      .map((u) => u.email);
+  }
+
+  /** Nhắc chứng chỉ sắp hết hạn (đúng mốc N ngày và mốc 7 ngày, tránh gửi lặp mỗi ngày) */
+  async remindCertificatesExpiring() {
+    const days = this.settings.get('employee').certificateRemindDays;
+    if (!days) return;
+    const marks = [...new Set([days, 7, 0].filter((d) => d <= days))];
+    const list = await this.qualifications
+      .createQueryBuilder('q')
+      .innerJoinAndSelect('q.employee', 'e')
+      .where('q.expiryDate IS NOT NULL')
+      .andWhere('e.status != :s', { s: EmployeeStatus.RESIGNED })
+      .andWhere(`(q.expiryDate - CURRENT_DATE) IN (:...marks)`, { marks })
+      .orderBy('q.expiryDate', 'ASC')
+      .getMany();
+    if (!list.length) return;
+    const rows = list
+      .map(
+        (q) =>
+          `<li><b>${esc(q.employee!.fullName)}</b> (${esc(q.employee!.code)}): ${esc(q.name)} hết hạn ngày ${new Date(q.expiryDate!).toLocaleDateString('vi-VN')}</li>`,
+      )
+      .join('');
+    const to = await this.hrRecipients();
+    this.logger.log(`${list.length} chứng chỉ sắp hết hạn, gửi nhắc cho ${to.length} người`);
+    await this.mail.send({
+      to,
+      subject: `${list.length} chứng chỉ sắp hết hạn`,
+      html: `<p>Các chứng chỉ sau sắp hết hạn, cần nhắc nhân viên gia hạn:</p><ul>${rows}</ul>`,
+    });
   }
 
   /** Nhắc người có quyền sửa hồ sơ về nhân viên sắp hết thử việc */
@@ -47,9 +87,7 @@ export class EmployeesScheduler {
       .getMany();
     if (!list.length) return;
 
-    const recipients = (await this.users.find({ where: { isActive: true } })).filter((u) =>
-      hasPermission(u.role?.permissions, 'employees.update'),
-    );
+    const recipients = await this.hrRecipients();
     const rows = list
       .map((e) => {
         const end = new Date(e.hireDate);
@@ -60,7 +98,7 @@ export class EmployeesScheduler {
 
     this.logger.log(`${list.length} nhân viên sắp hết thử việc, gửi nhắc cho ${recipients.length} người`);
     await this.mail.send({
-      to: recipients.map((u) => u.email),
+      to: recipients,
       subject: `${list.length} nhân viên sắp hết thử việc`,
       html: `<p>Các nhân viên sau sẽ hết thử việc trong ${probationRemindDays} ngày tới:</p><ul>${rows}</ul><p>Vui lòng đánh giá và cập nhật trạng thái trên hệ thống.</p>`,
     });

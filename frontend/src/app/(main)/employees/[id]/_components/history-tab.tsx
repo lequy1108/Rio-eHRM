@@ -19,6 +19,12 @@ const rank = (f: string) => (ORDER.indexOf(f) + 1 || 999);
 const ENTITY_LABEL: Record<string, string> = {
   Employee: 'hồ sơ',
   EmployeeDependent: 'người phụ thuộc',
+  EmployeeQualification: 'bằng cấp, chứng chỉ',
+  EmployeeExperience: 'kinh nghiệm',
+  EmployeeSkill: 'kỹ năng',
+  EmployeeReward: 'khen thưởng, kỷ luật',
+  EmployeeDocument: 'tài liệu',
+  EmployeeWorkHistory: 'quyết định công tác',
 };
 
 function verb(a: AuditLog) {

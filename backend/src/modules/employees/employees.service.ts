@@ -251,6 +251,47 @@ export class EmployeesService {
   }
 
   /** Thống kê nhanh cho dashboard */
+  /**
+   * Sinh nhật và kỷ niệm ngày vào làm trong `days` ngày tới (tính cả hôm nay), nhân viên chưa nghỉ việc.
+   * Sinh ngày 29/2 thì năm không nhuận tính vào 28/2.
+   */
+  async upcomingEvents(days = 30) {
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date());
+    const base = new Date(`${today}T00:00:00Z`);
+    const list = await this.repo
+      .createQueryBuilder('e')
+      .leftJoinAndSelect('e.department', 'd')
+      .where('e.status != :s', { s: EmployeeStatus.RESIGNED })
+      .getMany();
+
+    const next = (iso: string) => {
+      const [, m, d] = iso.split('-').map(Number);
+      for (const y of [base.getUTCFullYear(), base.getUTCFullYear() + 1]) {
+        const leap = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+        const day = m === 2 && d === 29 && !leap ? 28 : d;
+        const dt = new Date(Date.UTC(y, m - 1, day));
+        if (dt >= base) return dt;
+      }
+      return null;
+    };
+
+    type Ev = { type: 'BIRTHDAY' | 'ANNIVERSARY'; date: string; inDays: number; years: number; employee: Partial<Employee> };
+    const out: Ev[] = [];
+    for (const e of list) {
+      const who = { id: e.id, code: e.code, fullName: e.fullName, avatarUrl: e.avatarUrl, department: e.department };
+      for (const [type, src] of [['BIRTHDAY', e.dateOfBirth], ['ANNIVERSARY', e.hireDate]] as const) {
+        if (!src) continue;
+        const dt = next(String(src).slice(0, 10));
+        if (!dt) continue;
+        const inDays = Math.round((dt.getTime() - base.getTime()) / 86_400_000);
+        const years = dt.getUTCFullYear() - Number(String(src).slice(0, 4));
+        if (inDays > days || (type === 'ANNIVERSARY' && years < 1)) continue;
+        out.push({ type, date: dt.toISOString().slice(0, 10), inDays, years, employee: who as Partial<Employee> });
+      }
+    }
+    return out.sort((a, b) => a.inDays - b.inDays || a.employee.fullName!.localeCompare(b.employee.fullName!, 'vi'));
+  }
+
   async stats() {
     const total = await this.repo.count();
     const byStatus = await this.repo
