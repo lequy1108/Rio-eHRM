@@ -15,6 +15,8 @@ const schema = z.object({
   phone: z.string().trim().max(30),
   email: z.string().trim().refine((v) => !v || z.email().safeParse(v).success, 'Email không hợp lệ'),
   website: z.string().trim().max(255),
+  representativeName: z.string().trim().max(255),
+  representativeTitle: z.string().trim().max(100),
 });
 type Values = z.infer<typeof schema>;
 
@@ -57,6 +59,13 @@ export default function CompanySettingsPage() {
         </FormField>
         <FormField label="Website" htmlFor="website" className="sm:col-span-2">
           <Input id="website" placeholder="https://" {...register('website')} />
+        </FormField>
+        <div className="mt-2 border-t pt-4 text-sm font-medium sm:col-span-2">Người đại diện ký hợp đồng</div>
+        <FormField label="Họ tên" htmlFor="representativeName" hint="Tự điền vào hợp đồng mới, sửa được từng hợp đồng">
+          <Input id="representativeName" {...register('representativeName')} />
+        </FormField>
+        <FormField label="Chức vụ" htmlFor="representativeTitle">
+          <Input id="representativeTitle" placeholder="Giám đốc" {...register('representativeTitle')} />
         </FormField>
       </SettingsCard>
     </form>

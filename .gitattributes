@@ -1,0 +1,14 @@
+# Mọi file chữ lưu và check-out với xuống dòng LF trên mọi hệ điều hành (Windows, macOS, Linux)
+* text=auto eol=lf
+
+# File nhị phân: không đụng tới
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.xlsx binary
+*.docx binary
+*.woff binary
+*.woff2 binary

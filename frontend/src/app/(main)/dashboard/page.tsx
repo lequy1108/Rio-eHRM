@@ -15,6 +15,7 @@ import { GENDER_LABEL, type EmployeeStats, type EmployeeStatus } from '@/lib/typ
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/providers/auth-provider';
 import { HeadcountChart, type TrendPoint } from './_components/headcount-chart';
+import { ExpiringContracts } from './_components/expiring-contracts';
 import { UpcomingEvents } from './_components/upcoming-events';
 
 /** Thẻ số liệu: nhãn, con số, và so sánh với mốc cụ thể */
@@ -201,7 +202,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <UpcomingEvents />
+        <div className="grid content-start gap-6">
+          {can('contracts.view') && <ExpiringContracts />}
+          <UpcomingEvents />
+        </div>
       </div>
     </>
   );

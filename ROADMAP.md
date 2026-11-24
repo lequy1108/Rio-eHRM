@@ -102,7 +102,7 @@ Frontend, trải nghiệm người dùng
 ## 3. Hồ sơ nhân viên đầy đủ
 
 - [x] [BE+FE] Thông tin cơ bản, mã NV tự sinh, phòng ban, chức vụ, trạng thái
-- [ ] [FE] ⭐ Trang chi tiết nhân viên chia tab: Tổng quan / Cá nhân / Công việc / Hợp đồng / Lương / Tài liệu / Lịch sử _(đã có Tổng quan, Cá nhân, Năng lực, Công tác, Thuế · Ngân hàng, Người phụ thuộc, Tài liệu, Lịch sử; Hợp đồng, Lương làm cùng module tương ứng)_
+- [ ] [FE] ⭐ Trang chi tiết nhân viên chia tab: Tổng quan / Cá nhân / Công việc / Hợp đồng / Lương / Tài liệu / Lịch sử _(đã có Tổng quan, Cá nhân, Năng lực, Công tác, Hợp đồng, Thuế · Ngân hàng, Người phụ thuộc, Tài liệu, Lịch sử; Lương làm cùng module tương ứng)_
 - [x] [BE+FE] Ảnh đại diện
 - [x] [BE+FE] Thông tin cá nhân mở rộng: CCCD (ngày cấp, nơi cấp), quê quán, địa chỉ thường trú và tạm trú, dân tộc, tôn giáo, hôn nhân
 - [x] [BE+FE] Thông tin thuế và bảo hiểm: MST cá nhân, số sổ BHXH, nơi đăng ký khám chữa bệnh
@@ -123,14 +123,14 @@ Frontend, trải nghiệm người dùng
 
 ## 4. Hợp đồng lao động
 
-- [ ] [BE+FE] Loại hợp đồng: thử việc, xác định thời hạn, không xác định thời hạn, cộng tác viên, thời vụ
-- [ ] [BE+FE] Tạo hợp đồng: số HĐ tự sinh, ngày hiệu lực và hết hạn, lương, phụ cấp
-- [ ] [BE+FE] Mẫu hợp đồng có biến (họ tên, lương…), sinh PDF để in
-- [ ] [BE+FE] Phụ lục hợp đồng (thay đổi lương, chức danh)
-- [ ] [BE+FE] Gia hạn và tái ký từ hợp đồng cũ
-- [ ] [BE+FE] ⭐ Danh sách hợp đồng sắp hết hạn (30/15/7 ngày) + nhắc tự động
-- [ ] [BE+FE] Chấm dứt hợp đồng (lý do, ngày)
-- [ ] [BE+FE] Tải lên bản scan đã ký
+- [x] [BE+FE] Loại hợp đồng: thử việc, xác định thời hạn, không xác định thời hạn, cộng tác viên, thời vụ
+- [x] [BE+FE] Tạo hợp đồng: số HĐ tự sinh, ngày hiệu lực và hết hạn, lương, phụ cấp
+- [x] [BE+FE] Mẫu hợp đồng có biến (họ tên, lương…), sinh PDF để in _(trang in khổ A4, In / Lưu PDF từ trình duyệt)_
+- [x] [BE+FE] Phụ lục hợp đồng (thay đổi lương, chức danh)
+- [x] [BE+FE] Gia hạn và tái ký từ hợp đồng cũ
+- [x] [BE+FE] ⭐ Danh sách hợp đồng sắp hết hạn (30/15/7 ngày) + nhắc tự động
+- [x] [BE+FE] Chấm dứt hợp đồng (lý do, ngày)
+- [x] [BE+FE] Tải lên bản scan đã ký
 - [ ] [BE+FE] Ký số hợp đồng điện tử (tích hợp nhà cung cấp chữ ký số)
 
 ## 5. Thông báo & luồng phê duyệt

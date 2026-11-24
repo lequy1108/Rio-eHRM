@@ -25,6 +25,8 @@ const ENTITY_LABEL: Record<string, string> = {
   EmployeeReward: 'khen thưởng, kỷ luật',
   EmployeeDocument: 'tài liệu',
   EmployeeWorkHistory: 'quyết định công tác',
+  Contract: 'hợp đồng',
+  ContractAppendix: 'phụ lục hợp đồng',
 };
 
 function verb(a: AuditLog) {

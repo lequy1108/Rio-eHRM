@@ -1,6 +1,7 @@
 import {
   Briefcase,
   Building2,
+  FileSignature,
   LayoutDashboard,
   ListTree,
   Settings,
@@ -39,6 +40,13 @@ export const NAV: NavGroup[] = [
       { href: '/employees', label: 'Nhân viên', icon: Users, anyOf: ['employees.view'], keywords: 'nhan vien ho so' },
       { href: '/departments', label: 'Phòng ban', icon: Building2, keywords: 'phong ban to chuc' },
       { href: '/positions', label: 'Chức vụ', icon: Briefcase, keywords: 'chuc vu cap bac' },
+      {
+        href: '/contracts',
+        label: 'Hợp đồng',
+        icon: FileSignature,
+        anyOf: ['contracts.view'],
+        keywords: 'hop dong lao dong gia han het han phu luc',
+      },
     ],
   },
   {
@@ -50,7 +58,7 @@ export const NAV: NavGroup[] = [
         href: '/settings',
         label: 'Cài đặt',
         icon: Settings,
-        anyOf: ['settings.manage', 'roles.manage'],
+        anyOf: ['settings.manage', 'roles.manage', 'contracts.manage'],
         keywords: 'cai dat cau hinh cong ty logo mau email bao mat phan quyen vai tro truong tuy chinh',
       },
     ],

@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
-export type SettingGroup = 'company' | 'branding' | 'employee' | 'mail' | 'security';
+export type SettingGroup = 'company' | 'branding' | 'employee' | 'mail' | 'security' | 'contract';
 export type AllSettings = Record<SettingGroup, Record<string, unknown>>;
 
 export function useSettings() {

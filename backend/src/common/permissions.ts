@@ -19,6 +19,14 @@ export const PERMISSION_GROUPS = [
     ],
   },
   {
+    key: 'contracts',
+    label: 'Hợp đồng',
+    items: [
+      { key: 'contracts.view', label: 'Xem hợp đồng (gồm lương trong hợp đồng)' },
+      { key: 'contracts.manage', label: 'Tạo, sửa, gia hạn, chấm dứt hợp đồng; quản lý mẫu và loại hợp đồng' },
+    ],
+  },
+  {
     key: 'organization',
     label: 'Tổ chức',
     items: [{ key: 'organization.manage', label: 'Thêm, sửa, xoá phòng ban và chức vụ' }],
@@ -60,6 +68,8 @@ export const SYSTEM_ROLES: { code: string; name: string; description: string; pe
       'employees.documents',
       'employees.import',
       'employees.export',
+      'contracts.view',
+      'contracts.manage',
       'organization.manage',
       'catalogs.manage',
     ],

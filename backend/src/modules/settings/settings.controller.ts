@@ -50,6 +50,21 @@ export class SettingsController {
     return this.settings.all();
   }
 
+  /** Cài đặt hợp đồng: người quản lý hợp đồng tự chỉnh được, không cần quyền cài đặt hệ thống */
+  @ApiBearerAuth()
+  @Get('contract')
+  @Permissions('contracts.manage')
+  contract() {
+    return this.settings.get('contract');
+  }
+
+  @ApiBearerAuth()
+  @Put('contract')
+  @Permissions('contracts.manage')
+  updateContract(@Body() body: Record<string, unknown>) {
+    return this.settings.update('contract', body ?? {});
+  }
+
   @ApiBearerAuth()
   @Put(':group')
   @Permissions('settings.manage')
