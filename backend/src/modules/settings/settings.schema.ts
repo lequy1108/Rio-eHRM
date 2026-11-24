@@ -46,6 +46,29 @@ export class CompanySettings {
   email!: string;
 
   @apply(...optionalText(255)) website!: string;
+
+  /** Người đại diện ký hợp đồng phía công ty */
+  @apply(...optionalText(255)) representativeName!: string;
+  @apply(...optionalText(100)) representativeTitle!: string;
+}
+
+export class ContractSettings {
+  /**
+   * Mẫu số hợp đồng. Biến: {seq} số thứ tự trong năm, {year} năm ký, {code} mã nhân viên, {type} mã loại HĐ.
+   * Vd {seq}/{year}/HĐLĐ → 001/2026/HĐLĐ
+   */
+  @Matches(/\{seq\}/, { message: 'Mẫu số hợp đồng phải có {seq}' })
+  @MaxLength(60)
+  numberFormat!: string;
+
+  @apply(...intRange(1, 8, 'Số chữ số thứ tự'))
+  seqLength!: number;
+
+  /** Các mốc nhắc trước khi hết hạn, vd "30,15,7" */
+  @Matches(/^\s*\d{1,3}(\s*,\s*\d{1,3}){0,5}\s*$/, { message: 'Mốc nhắc là các số ngày ngăn cách bằng dấu phẩy, vd 30,15,7' })
+  remindDays!: string;
+
+  @apply(...optionalText(255)) defaultWorkLocation!: string;
 }
 
 export class BrandingSettings {
@@ -143,6 +166,7 @@ export const SETTING_CLASSES = {
   employee: EmployeeSettings,
   mail: MailSettings,
   security: SecuritySettings,
+  contract: ContractSettings,
 };
 
 export type SettingGroup = keyof typeof SETTING_CLASSES;
@@ -154,10 +178,22 @@ export const SETTING_GROUP_LABEL: Record<SettingGroup, string> = {
   employee: 'Quy tắc nhân sự',
   mail: 'Email',
   security: 'Bảo mật',
+  contract: 'Hợp đồng',
 };
 
 export const SETTING_DEFAULTS: SettingsMap = {
-  company: { name: 'Công ty của bạn', shortName: '', taxCode: '', address: '', phone: '', email: '', website: '' },
+  company: {
+    name: 'Công ty của bạn',
+    shortName: '',
+    taxCode: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    representativeName: '',
+    representativeTitle: 'Giám đốc',
+  },
+  contract: { numberFormat: '{seq}/{year}/HĐLĐ', seqLength: 3, remindDays: '30,15,7', defaultWorkLocation: '' },
   branding: {
     appName: 'eHRM',
     primaryColor: '#0049EA',

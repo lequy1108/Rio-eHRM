@@ -224,6 +224,84 @@ export const WORK_CHANGE_LABEL: Record<WorkChangeType, string> = {
 };
 export const SKILL_LEVEL_LABEL = ['', 'Cơ bản', 'Trung bình', 'Khá', 'Tốt', 'Thành thạo'];
 
+/* ---------- Hợp đồng lao động ---------- */
+
+export interface Allowance {
+  name: string;
+  amount: number;
+}
+
+export interface ContractType extends Base {
+  code: string;
+  name: string;
+  hasTerm: boolean;
+  defaultMonths?: number | null;
+  isProbation: boolean;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface ContractTemplate extends Base {
+  name: string;
+  description?: string | null;
+  content?: string;
+  isDefault: boolean;
+}
+
+export interface ContractAppendix extends Base {
+  contractId: string;
+  appendixNumber: string;
+  signDate: string;
+  effectiveDate: string;
+  content?: string | null;
+  jobTitle?: string | null;
+  baseSalary?: number | null;
+  insuranceSalary?: number | null;
+  allowances?: Allowance[] | null;
+}
+
+export type ContractState = 'upcoming' | 'active' | 'expiring' | 'expired' | 'terminated';
+
+export interface Contract extends Base {
+  employeeId: string;
+  employee?: Employee;
+  typeId?: string | null;
+  type?: ContractType | null;
+  contractNumber: string;
+  signDate: string;
+  startDate: string;
+  endDate?: string | null;
+  jobTitle?: string | null;
+  workLocation?: string | null;
+  baseSalary: number;
+  insuranceSalary?: number | null;
+  allowances: Allowance[];
+  signerName?: string | null;
+  signerTitle?: string | null;
+  note?: string | null;
+  previousContractId?: string | null;
+  previousContract?: Contract | null;
+  status: 'ACTIVE' | 'TERMINATED';
+  terminatedDate?: string | null;
+  terminationReason?: string | null;
+  signedFileName?: string | null;
+  signedFileMime?: string | null;
+  signedFileSize?: number | null;
+  appendices?: ContractAppendix[];
+  state: ContractState;
+  daysLeft: number | null;
+  renewedBy?: { id: string; contractNumber: string } | null;
+  current?: { jobTitle?: string | null; baseSalary: number; insuranceSalary?: number | null; allowances: Allowance[] };
+}
+
+export const CONTRACT_STATE: Record<ContractState, { label: string; dot: string }> = {
+  active: { label: 'Đang hiệu lực', dot: 'bg-success' },
+  expiring: { label: 'Sắp hết hạn', dot: 'bg-warning' },
+  expired: { label: 'Đã hết hạn', dot: 'bg-destructive' },
+  upcoming: { label: 'Chưa bắt đầu', dot: 'bg-primary' },
+  terminated: { label: 'Đã chấm dứt', dot: 'bg-muted-foreground/40' },
+};
+
 export interface Dependent extends Base {
   employeeId: string;
   fullName: string;
@@ -406,6 +484,21 @@ export const FIELD_LABEL: Record<string, string> = {
   toDepartment: 'Phòng ban mới',
   toPosition: 'Chức vụ mới',
   toManager: 'Quản lý mới',
+  contractNumber: 'Số hợp đồng',
+  contractType: 'Loại hợp đồng',
+  signDate: 'Ngày ký',
+  startDate: 'Ngày bắt đầu',
+  endDate: 'Ngày kết thúc',
+  jobTitle: 'Chức danh',
+  workLocation: 'Địa điểm làm việc',
+  baseSalary: 'Lương cơ bản',
+  insuranceSalary: 'Lương đóng BHXH',
+  allowances: 'Phụ cấp',
+  signerName: 'Người ký',
+  contractStatus: 'Trạng thái hợp đồng',
+  signedFile: 'Bản scan đã ký',
+  appendixNumber: 'Số phụ lục',
+  content: 'Nội dung',
 };
 
 

@@ -20,6 +20,7 @@ import { EmployeeFormDialog } from '../_components/employee-form-dialog';
 import { formatCustomValue, groupBySection, useCustomFields } from '@/lib/custom-fields';
 import { CareerTab } from './_components/career-tab';
 import { CompetenceTab } from './_components/competence-tab';
+import { ContractsTab } from './_components/contracts-tab';
 import { CustomFieldsDialog } from './_components/custom-fields-dialog';
 import { DocumentsTab } from './_components/documents-tab';
 import { DependentsTab } from './_components/dependents-tab';
@@ -27,7 +28,7 @@ import { HistoryTab } from './_components/history-tab';
 import { Info, Section } from './_components/section';
 import { SectionDialogs, type SectionKey } from './_components/section-dialogs';
 
-const TABS = ['overview', 'personal', 'competence', 'career', 'finance', 'dependents', 'documents', 'history'] as const;
+const TABS = ['overview', 'personal', 'competence', 'career', 'contracts', 'finance', 'dependents', 'documents', 'history'] as const;
 type Tab = (typeof TABS)[number];
 
 export default function EmployeeDetailPage() {
@@ -42,6 +43,7 @@ export default function EmployeeDetailPage() {
   const canDelete = can('employees.delete');
   const canSensitive = can('employees.sensitive');
   const canDocuments = can('employees.documents');
+  const canContracts = can('contracts.view');
   const { data: customFields = [] } = useCustomFields();
   const [customSection, setCustomSection] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function EmployeeDetailPage() {
 
   // Tab lưu trên URL (?tab=) để F5 hay gửi link vẫn mở đúng tab
   const visible = TABS.filter(
-    (t) => (canSensitive || (t !== 'finance' && t !== 'dependents')) && (canDocuments || t !== 'documents'),
+    (t) => (canSensitive || (t !== 'finance' && t !== 'dependents')) && (canDocuments || t !== 'documents') && (canContracts || t !== 'contracts'),
   );
   const raw = params.get('tab') as Tab | null;
   const tab: Tab = raw && visible.includes(raw) ? raw : 'overview';
@@ -140,13 +142,11 @@ export default function EmployeeDetailPage() {
                 <TabsTrigger value="personal">Cá nhân</TabsTrigger>
                 <TabsTrigger value="competence">Năng lực</TabsTrigger>
                 <TabsTrigger value="career">Công tác</TabsTrigger>
+                {canContracts && <TabsTrigger value="contracts">Hợp đồng</TabsTrigger>}
                 {canSensitive && <TabsTrigger value="finance">Thuế · Ngân hàng</TabsTrigger>}
                 {canSensitive && <TabsTrigger value="dependents">Người phụ thuộc</TabsTrigger>}
                 {canDocuments && <TabsTrigger value="documents">Tài liệu</TabsTrigger>}
                 <TabsTrigger value="history">Lịch sử</TabsTrigger>
-                <TabsTrigger value="contract" disabled>
-                  Hợp đồng
-                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -279,6 +279,12 @@ export default function EmployeeDetailPage() {
             <TabsContent value="career">
               <CareerTab employee={e} canEdit={canEdit} />
             </TabsContent>
+
+            {canContracts && (
+              <TabsContent value="contracts">
+                <ContractsTab employee={e} canManage={can('contracts.manage')} />
+              </TabsContent>
+            )}
 
             {canDocuments && (
               <TabsContent value="documents">

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { api } from './api';
-import type { AppRole, CatalogItem, CatalogType, Department, Employee, Paginated, Position } from './types';
+import type { AppRole, CatalogItem, ContractType, CatalogType, Department, Employee, Paginated, Position } from './types';
 
 /** Danh sách phòng ban cho ô chọn (cache 5 phút) */
 export function useDepartmentOptions() {
@@ -56,5 +56,14 @@ export function useRoleOptions() {
     queryFn: () => api<AppRole[]>('/roles'),
     staleTime: 60_000,
     select: (roles) => roles.map((r) => ({ value: r.id, label: r.name, code: r.code })),
+  });
+}
+
+/** Loại hợp đồng (đang dùng) cho ô chọn */
+export function useContractTypes(activeOnly = true) {
+  return useQuery({
+    queryKey: ['contract-types', activeOnly],
+    queryFn: () => api<ContractType[]>('/contract-types', { query: { activeOnly } }),
+    staleTime: 5 * 60_000,
   });
 }
