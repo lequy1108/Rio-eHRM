@@ -102,24 +102,24 @@ Frontend, trải nghiệm người dùng
 ## 3. Hồ sơ nhân viên đầy đủ
 
 - [x] [BE+FE] Thông tin cơ bản, mã NV tự sinh, phòng ban, chức vụ, trạng thái
-- [ ] [FE] ⭐ Trang chi tiết nhân viên chia tab: Tổng quan / Cá nhân / Công việc / Hợp đồng / Lương / Tài liệu / Lịch sử _(đã có Tổng quan, Cá nhân, Thuế · Ngân hàng, Người phụ thuộc, Lịch sử; Hợp đồng, Lương, Tài liệu làm cùng module tương ứng)_
+- [ ] [FE] ⭐ Trang chi tiết nhân viên chia tab: Tổng quan / Cá nhân / Công việc / Hợp đồng / Lương / Tài liệu / Lịch sử _(đã có Tổng quan, Cá nhân, Năng lực, Công tác, Thuế · Ngân hàng, Người phụ thuộc, Tài liệu, Lịch sử; Hợp đồng, Lương làm cùng module tương ứng)_
 - [x] [BE+FE] Ảnh đại diện
 - [x] [BE+FE] Thông tin cá nhân mở rộng: CCCD (ngày cấp, nơi cấp), quê quán, địa chỉ thường trú và tạm trú, dân tộc, tôn giáo, hôn nhân
 - [x] [BE+FE] Thông tin thuế và bảo hiểm: MST cá nhân, số sổ BHXH, nơi đăng ký khám chữa bệnh
 - [x] [BE+FE] Tài khoản ngân hàng nhận lương
 - [x] [BE+FE] Người phụ thuộc (giảm trừ gia cảnh): họ tên, quan hệ, MST, thời gian áp dụng
 - [x] [BE+FE] Liên hệ khẩn cấp
-- [ ] [BE+FE] Học vấn, bằng cấp, chứng chỉ (có ngày hết hạn và nhắc gia hạn)
-- [ ] [BE+FE] Kinh nghiệm làm việc trước đây
-- [ ] [BE+FE] Kỹ năng, ngoại ngữ
-- [ ] [BE+FE] Tài liệu đính kèm (CV, bản scan CCCD, bằng cấp) có phân loại
-- [ ] [BE+FE] Lịch sử công tác: điều chuyển, bổ nhiệm, thăng chức, có hiệu lực theo ngày
-- [ ] [BE+FE] Khen thưởng và kỷ luật
+- [x] [BE+FE] Học vấn, bằng cấp, chứng chỉ (có ngày hết hạn và nhắc gia hạn)
+- [x] [BE+FE] Kinh nghiệm làm việc trước đây
+- [x] [BE+FE] Kỹ năng, ngoại ngữ
+- [x] [BE+FE] Tài liệu đính kèm (CV, bản scan CCCD, bằng cấp) có phân loại
+- [x] [BE+FE] Lịch sử công tác: điều chuyển, bổ nhiệm, thăng chức, có hiệu lực theo ngày
+- [x] [BE+FE] Khen thưởng và kỷ luật
 - [x] [BE+FE] ⭐ Nhập nhân viên hàng loạt từ Excel
 - [x] [BE+FE] ⭐ Xuất danh sách nhân viên ra Excel theo bộ lọc
 - [ ] [FE] Xem danh sách dạng thẻ (card) hoặc dạng bảng
-- [ ] [BE] Tính tự động: tuổi, thâm niên, ngày hết thử việc _(tuổi và thâm niên đã hiển thị; ngày hết thử việc mới dùng trong nhắc việc, cần đưa số tháng thử việc vào cấu hình)_
-- [ ] [BE+FE] Lịch sinh nhật và kỷ niệm ngày vào làm
+- [ ] [BE] Tính tự động: tuổi, thâm niên, ngày hết thử việc _(tuổi và thâm niên đã hiển thị; số tháng thử việc đã có trong Cài đặt, ngày hết thử việc mới dùng trong email nhắc, chưa hiện trên hồ sơ)_
+- [x] [BE+FE] Lịch sinh nhật và kỷ niệm ngày vào làm _(thẻ 30 ngày tới trên bảng điều khiển)_
 
 ## 4. Hợp đồng lao động
 
