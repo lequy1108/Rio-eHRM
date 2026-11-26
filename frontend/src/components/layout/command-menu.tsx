@@ -36,7 +36,8 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
   // Phím tắt Ctrl+K / Cmd+K
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
+      // Trình duyệt tự điền (autofill) có thể phát sự kiện bàn phím không có key
+      if (e.key?.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         onOpenChange(!open);
       }
