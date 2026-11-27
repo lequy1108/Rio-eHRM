@@ -66,6 +66,8 @@ export interface Employee extends Base {
   bankBranch?: string | null;
   customFields?: Record<string, unknown>;
   hireDate: string;
+  /** Chỉ có ở GET /employees/:id khi đang thử việc */
+  probationEnd?: { date: string; source: 'contract' | 'estimate' } | null;
   status: EmployeeStatus;
   departmentId?: string | null;
   department?: Department | null;
@@ -351,6 +353,8 @@ export interface User extends Base {
   permissions?: string[];
   isActive: boolean;
   lockedUntil?: string | null;
+  /** Tạo qua lời mời, chưa tự đặt mật khẩu */
+  mustSetPassword?: boolean;
   lastLoginAt?: string | null;
   employeeId?: string | null;
   employee?: Employee | null;
@@ -505,3 +509,23 @@ export const FIELD_LABEL: Record<string, string> = {
 /** Chuyển object enum-label thành danh sách lựa chọn cho Select */
 export const toOptions = <K extends string>(map: Record<K, string>) =>
   (Object.keys(map) as K[]).map((value) => ({ value, label: map[value] }));
+
+export interface Holiday {
+  id: string;
+  date: string;
+  name: string;
+  paid: boolean;
+  note?: string | null;
+}
+
+export interface OrgNode {
+  id: string;
+  code: string;
+  fullName: string;
+  email: string;
+  avatarUrl?: string | null;
+  managerId?: string | null;
+  status: EmployeeStatus;
+  department?: { id: string; name: string } | null;
+  position?: { id: string; name: string } | null;
+}

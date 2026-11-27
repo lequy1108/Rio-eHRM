@@ -27,6 +27,10 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'roleId' })
   role?: Relation<AppRole> | null;
 
+  /** Tạo qua lời mời, chưa tự đặt mật khẩu lần đầu */
+  @Column({ default: false })
+  mustSetPassword!: boolean;
+
   /** Số lần đăng nhập sai liên tiếp */
   @Exclude()
   @Column({ type: 'int', default: 0 })

@@ -36,6 +36,11 @@ export class AuthService {
         `Tài khoản tạm khoá do đăng nhập sai nhiều lần, thử lại sau ${minutesLeft(user.lockedUntil)} phút`,
       );
     }
+    if (user?.mustSetPassword) {
+      throw new UnauthorizedException(
+        'Tài khoản chưa kích hoạt. Mở link trong email mời để đặt mật khẩu, hoặc bấm Quên mật khẩu để nhận link mới',
+      );
+    }
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       if (user) {
         const until = await this.users.recordFailedLogin(user);

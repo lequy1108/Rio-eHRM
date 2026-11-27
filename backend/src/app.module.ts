@@ -18,6 +18,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
 import { HealthController } from './modules/health/health.controller';
 import { PositionsModule } from './modules/positions/positions.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { HolidaysModule } from './modules/holidays/holidays';
 import { ContractsModule } from './modules/contracts/contracts.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { CustomFieldsModule } from './modules/custom-fields/custom-fields.module';
@@ -40,6 +41,7 @@ import { UsersModule } from './modules/users/users.module';
     EmployeesModule,
     CatalogsModule,
     ContractsModule,
+    HolidaysModule,
   ],
   controllers: [HealthController],
   providers: [

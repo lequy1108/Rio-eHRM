@@ -9,6 +9,21 @@ export class LoginDto {
   password!: string;
 }
 
+export class ForgotPasswordDto {
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  email!: string;
+}
+
+export class SetPasswordDto {
+  @IsString()
+  @MinLength(20)
+  token!: string;
+
+  @IsString()
+  @MinLength(1)
+  password!: string;
+}
+
 export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()

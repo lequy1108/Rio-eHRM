@@ -86,6 +86,12 @@ export class EmployeesController {
     return this.service.upcomingEvents(Math.min(Math.max(days, 1), 366));
   }
 
+  @Get('org-chart')
+  @Permissions('employees.view')
+  orgChart() {
+    return this.service.orgChart();
+  }
+
   @Get('stats')
   @Permissions('employees.view')
   stats() {
@@ -153,7 +159,7 @@ export class EmployeesController {
       for (const k of SENSITIVE_FIELDS) (emp as unknown as Record<string, unknown>)[k] = undefined;
       for (const d of await this.sensitiveKeys()) delete emp.customFields?.[d.key];
     }
-    return emp;
+    return { ...emp, probationEnd: await this.service.probationEnd(emp) };
   }
 
   @Post()

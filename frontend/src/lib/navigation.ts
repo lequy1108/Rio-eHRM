@@ -4,6 +4,7 @@ import {
   FileSignature,
   LayoutDashboard,
   ListTree,
+  Network,
   Settings,
   UserCog,
   Users,
@@ -38,6 +39,7 @@ export const NAV: NavGroup[] = [
     label: 'Nhân sự',
     items: [
       { href: '/employees', label: 'Nhân viên', icon: Users, anyOf: ['employees.view'], keywords: 'nhan vien ho so' },
+      { href: '/org-chart', label: 'Sơ đồ tổ chức', icon: Network, anyOf: ['employees.view'], keywords: 'so do to chuc quan ly cap tren cap duoi' },
       { href: '/departments', label: 'Phòng ban', icon: Building2, keywords: 'phong ban to chuc' },
       { href: '/positions', label: 'Chức vụ', icon: Briefcase, keywords: 'chuc vu cap bac' },
       {

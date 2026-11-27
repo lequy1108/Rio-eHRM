@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
-import { CreateUserDto, QueryUserDto, ResetPasswordDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, InviteDto, QueryUserDto, ResetPasswordDto, UpdateUserDto } from './dto/user.dto';
+import { InvitationsService } from './invitations.service';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -10,7 +11,29 @@ import { UsersService } from './users.service';
 @Permissions('users.manage')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
+  constructor(
+    private readonly service: UsersService,
+    private readonly invitations: InvitationsService,
+  ) {}
+
+  /** Nhân viên có email nhưng chưa có tài khoản */
+  @Get('invite-candidates')
+  candidates() {
+    return this.invitations.candidates();
+  }
+
+  /** Tạo tài khoản cho nhân viên và gửi email mời đặt mật khẩu */
+  @Post('invite')
+  @HttpCode(200)
+  invite(@Body() dto: InviteDto) {
+    return this.invitations.invite(dto.employeeIds, dto.roleId);
+  }
+
+  @Post(':id/resend-invite')
+  @HttpCode(200)
+  resend(@Param('id', ParseUUIDPipe) id: string) {
+    return this.invitations.resend(id);
+  }
 
   @Get()
   findAll(@Query() query: QueryUserDto) {

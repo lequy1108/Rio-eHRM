@@ -1,6 +1,6 @@
 import { PartialType, OmitType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEmail, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 
 export class CreateUserDto {
@@ -40,4 +40,17 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(1)
   password!: string;
+}
+
+export class InviteDto {
+  @IsArray()
+  @ArrayMinSize(1, { message: 'Chọn ít nhất một nhân viên' })
+  @ArrayMaxSize(500)
+  @IsUUID('all', { each: true })
+  employeeIds!: string[];
+
+  /** Bỏ trống = vai trò Nhân viên */
+  @IsOptional()
+  @IsUUID()
+  roleId?: string;
 }
