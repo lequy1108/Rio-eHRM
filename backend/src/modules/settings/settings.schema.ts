@@ -84,6 +84,12 @@ export class BrandingSettings {
   @apply(...optionalText(120)) loginTitle!: string;
   @apply(...optionalText(255)) loginSubtitle!: string;
 
+  /** Địa chỉ người dùng mở hệ thống, dùng để tạo link trong email (mời, đặt lại mật khẩu) */
+  @IsOptional()
+  @ValidateIf((o: BrandingSettings) => !!o.appUrl)
+  @Matches(/^https?:\/\/[^\s]+$/, { message: 'Địa chỉ phải bắt đầu bằng http:// hoặc https://' })
+  appUrl!: string;
+
   /** Đường dẫn ảnh, chỉ đổi qua API tải ảnh */
   @IsOptional() @IsString() logoUrl!: string;
   @IsOptional() @IsString() faviconUrl!: string;
@@ -199,6 +205,7 @@ export const SETTING_DEFAULTS: SettingsMap = {
     primaryColor: '#0049EA',
     loginTitle: 'Đăng nhập',
     loginSubtitle: 'Dùng email công ty mà quản trị viên đã cấp',
+    appUrl: '',
     logoUrl: '',
     faviconUrl: '',
   },

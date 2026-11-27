@@ -1,14 +1,39 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, LoginDto } from './dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginDto, SetPasswordDto } from './dto/auth.dto';
+import { InvitationsService } from '../users/invitations.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly invitations: InvitationsService,
+  ) {}
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(200)
+  forgot(@Body() dto: ForgotPasswordDto) {
+    return this.invitations.forgot(dto.email);
+  }
+
+  /** Kiểm tra link mời / đặt lại mật khẩu trước khi hiện form */
+  @Public()
+  @Get('token-info')
+  tokenInfo(@Query('token') token: string) {
+    return this.invitations.info(token ?? '');
+  }
+
+  @Public()
+  @Post('set-password')
+  @HttpCode(200)
+  setPassword(@Body() dto: SetPasswordDto) {
+    return this.invitations.setPassword(dto.token, dto.password);
+  }
 
   @Public()
   @Post('login')

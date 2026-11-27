@@ -111,6 +111,12 @@ export class SettingsService implements OnModuleInit {
     return this.all()[group];
   }
 
+  /** Địa chỉ frontend để tạo link trong email: Cài đặt → Giao diện, rồi biến FRONTEND_URL, rồi CORS_ORIGIN */
+  appUrl() {
+    const url = this.cache.branding.appUrl || process.env.FRONTEND_URL || (process.env.CORS_ORIGIN ?? 'http://localhost:3000').split(',')[0];
+    return url.replace(/\/+$/, '');
+  }
+
   /** Kiểm tra mật khẩu theo chính sách trong mục Bảo mật */
   assertPassword(password: string) {
     const s = this.cache.security;

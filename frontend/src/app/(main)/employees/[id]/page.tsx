@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Briefcase, Building2, Calendar, Mail, Pencil, Phone, Trash2, User } from 'lucide-react';
+import { Briefcase, Building2, Calendar, CalendarClock, Mail, Pencil, Phone, Trash2, User } from 'lucide-react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -30,6 +30,14 @@ import { SectionDialogs, type SectionKey } from './_components/section-dialogs';
 
 const TABS = ['overview', 'personal', 'competence', 'career', 'contracts', 'finance', 'dependents', 'documents', 'history'] as const;
 type Tab = (typeof TABS)[number];
+
+/** Còn bao nhiêu ngày đến hết thử việc */
+function probationLeft(date: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = Math.round((new Date(`${date}T00:00:00`).getTime() - today.getTime()) / 86_400_000);
+  return d > 0 ? `còn ${d} ngày` : d === 0 ? 'hôm nay' : `quá ${-d} ngày`;
+}
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -173,6 +181,22 @@ export default function EmployeeDetailPage() {
                 <Info icon={Briefcase} label="Chức vụ" value={e.position?.name} />
                 <Info icon={Calendar} label="Ngày vào làm" value={formatDate(e.hireDate)} mono />
                 <Info icon={Calendar} label="Thâm niên" value={formatTenure(e.hireDate)} />
+                {e.probationEnd && (
+                  <Info
+                    icon={CalendarClock}
+                    label="Hết thử việc"
+                    value={
+                      <>
+                        <span className="font-mono tabular-nums">{formatDate(e.probationEnd.date)}</span>
+                        <span className="text-muted-foreground">
+                          {' · '}
+                          {probationLeft(e.probationEnd.date)}
+                          {e.probationEnd.source === 'estimate' && ', ước tính theo số tháng thử việc trong Cài đặt'}
+                        </span>
+                      </>
+                    }
+                  />
+                )}
                 <Info
                   icon={User}
                   label="Quản lý trực tiếp"

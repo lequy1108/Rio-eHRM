@@ -124,7 +124,10 @@ Thư viện: TanStack Query (gọi API + cache), react-hook-form + zod 4 (form),
 ## Trạng thái
 
 Đã có (xong Giai đoạn 0, trừ PDF và hàng đợi BullMQ):
-- Auth: đăng nhập, `/auth/me`, đổi mật khẩu; tự đăng xuất khi token hết hạn
+- Auth: đăng nhập, `/auth/me`, đổi mật khẩu; tự đăng xuất khi token hết hạn; quên mật khẩu `POST /auth/forgot-password` (luôn trả cùng thông báo, tối đa 1 email/2 phút), `GET /auth/token-info`, `POST /auth/set-password`
+- Lời mời tài khoản: `GET /users/invite-candidates`, `POST /users/invite` `{employeeIds, roleId?}`, `POST /users/:id/resend-invite`. Token một lần trong bảng `user_tokens` (chỉ lưu SHA-256; INVITE 72 giờ, RESET 60 phút). Tài khoản mời có `mustSetPassword=true`, chưa đăng nhập được cho tới khi đặt mật khẩu. Chưa cấu hình email thì API trả `link` để quản trị chép gửi tay. Link tạo từ `SettingsService.appUrl()`: Cài đặt → Giao diện → Địa chỉ truy cập, rồi `FRONTEND_URL`, rồi `CORS_ORIGIN`
+- Ngày nghỉ lễ: `/holidays?year=` (ai đăng nhập cũng xem), CRUD + `POST /holidays/generate` cần `settings.manage`. Âm lịch: `common/utils/lunar.ts` (`lunarToSolar`, thuật toán Hồ Ngọc Đức, UTC+7)
+- Sơ đồ tổ chức: `GET /employees/org-chart`; `EmployeesService.assertNoCycle` chặn vòng lặp quản lý khi tạo/sửa. `GET /employees/:id` có thêm `probationEnd {date, source: contract|estimate}` khi đang thử việc
 - Users (chỉ ADMIN): CRUD, khoá/mở, đổi vai trò, gắn nhân viên, `PATCH /users/:id/password` đặt lại mật khẩu; không tự khoá/xoá/hạ quyền chính mình
 - Employees: CRUD, tự sinh mã `NV0001`, lọc, sắp xếp, `/stats`, `/export` (Excel), `/import` + `/import/template`, `/bulk-delete`, `/:id/avatar`; nhắc HR nhân viên sắp hết thử việc lúc 8h hằng ngày (2 tháng thử việc, cố định trong code)
 - Departments: CRUD, cây tổ chức `/tree`, đếm nhân viên, chặn xoá khi còn nhân viên hoặc phòng con, chặn chọn cấp trên tạo vòng lặp
@@ -135,7 +138,7 @@ Thư viện: TanStack Query (gọi API + cache), react-hook-form + zod 4 (form),
 - Cài đặt `/settings` (công ty, giao diện, quy tắc nhân sự, trường tuỳ chỉnh, vai trò và quyền, bảo mật, email); `/roles` CRUD + `/roles/permissions`; `/custom-fields` CRUD + `/order`
 - Hợp đồng: `/contracts` (+ `/stats`, `/next-number`, `/:id/render`, `/:id/terminate`, `/:id/signed-file`, `/:id/appendices`), `/contract-types`, `/contract-templates` (+ `/placeholders`); cài đặt nhóm `contract` sửa được với quyền `contracts.manage` qua `GET/PUT /settings/contract`
 - Health: `/health`
-- Giao diện: đăng nhập, Bảng điều khiển, Nhân viên (danh sách + chi tiết 5 tab), Phòng ban, Danh mục, Chức vụ, Tài khoản, Hồ sơ của tôi, 404/403/lỗi
+- Giao diện: đăng nhập, quên mật khẩu `/forgot-password`, đặt mật khẩu `/set-password?token=` (dùng chung khung `components/auth-shell.tsx`), Sơ đồ tổ chức `/org-chart` (kéo thả đổi quản lý), Cài đặt → Ngày nghỉ lễ, Bảng điều khiển, Nhân viên (danh sách + chi tiết 5 tab), Phòng ban, Danh mục, Chức vụ, Tài khoản, Hồ sơ của tôi, 404/403/lỗi
 
 Lộ trình chi tiết và checklist: xem **`ROADMAP.md`** (19 giai đoạn, 0–18, sắp theo thứ tự phụ thuộc).
 - Trước khi làm, đọc giai đoạn liên quan trong `ROADMAP.md` để biết phần nào đã xong và phần nào cần có trước.

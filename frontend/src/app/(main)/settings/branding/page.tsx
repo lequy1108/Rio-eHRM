@@ -20,6 +20,11 @@ const schema = z.object({
   primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Màu ở dạng #RRGGBB'),
   loginTitle: z.string().trim().max(120),
   loginSubtitle: z.string().trim().max(255),
+  appUrl: z
+    .string()
+    .trim()
+    .max(255)
+    .refine((v) => !v || /^https?:\/\/\S+$/.test(v), 'Địa chỉ phải bắt đầu bằng http:// hoặc https://'),
 });
 type Values = z.infer<typeof schema>;
 
@@ -95,9 +100,16 @@ export default function BrandingSettingsPage() {
   const save = useSaveSettings('branding');
   const form = useForm<Values>({ resolver: zodResolver(schema) });
   const { register, handleSubmit, watch, setValue, formState: { errors, isDirty } } = form;
-  const saved = data?.branding as (Values & { logoUrl: string; faviconUrl: string }) | undefined;
+  const saved = data?.branding as (Partial<Values> & Values & { logoUrl: string; faviconUrl: string }) | undefined;
   const initial = useMemo(
-    () => saved && { appName: saved.appName, primaryColor: saved.primaryColor, loginTitle: saved.loginTitle, loginSubtitle: saved.loginSubtitle },
+    () =>
+      saved && {
+        appName: saved.appName,
+        primaryColor: saved.primaryColor,
+        loginTitle: saved.loginTitle,
+        loginSubtitle: saved.loginSubtitle,
+        appUrl: saved.appUrl ?? '',
+      },
     [saved],
   );
   useLoadForm(form, initial);
@@ -158,6 +170,23 @@ export default function BrandingSettingsPage() {
             </FormField>
             <FormField label="Dòng mô tả dưới tiêu đề" htmlFor="loginSubtitle">
               <Input id="loginSubtitle" {...register('loginSubtitle')} />
+            </FormField>
+            <FormField
+              label="Địa chỉ truy cập hệ thống"
+              htmlFor="appUrl"
+              error={errors.appUrl?.message}
+              hint="Dùng để tạo link trong email mời và đặt lại mật khẩu. Bỏ trống thì lấy theo cấu hình máy chủ"
+            >
+              <div className="flex gap-2">
+                <Input id="appUrl" placeholder="https://hr.congty.vn" className="font-mono" aria-invalid={!!errors.appUrl} {...register('appUrl')} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setValue('appUrl', window.location.origin, { shouldDirty: true, shouldValidate: true })}
+                >
+                  Dùng địa chỉ này
+                </Button>
+              </div>
             </FormField>
           </div>
 

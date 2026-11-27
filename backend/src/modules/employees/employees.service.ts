@@ -171,7 +171,56 @@ export class EmployeesService {
     return this.audit.history('Employee', id, page, limit);
   }
 
+  /** Chặn vòng lặp quản lý: A quản lý B thì B (hay cấp dưới của B) không thể quản lý A */
+  async assertNoCycle(id: string, managerId: string) {
+    if (managerId === id) throw new BadRequestException('Nhân viên không thể là quản lý của chính mình');
+    const rows: { id: string }[] = await this.repo.query(
+      `WITH RECURSIVE up AS (
+         SELECT id, "managerId", 1 AS depth FROM employees WHERE id = $1
+         UNION ALL
+         SELECT e.id, e."managerId", up.depth + 1 FROM employees e JOIN up ON e.id = up."managerId" WHERE up.depth < 100
+       ) SELECT id FROM up WHERE id = $2 LIMIT 1`,
+      [managerId, id],
+    );
+    if (rows.length) throw new BadRequestException('Không thể chọn cấp dưới của nhân viên này làm quản lý (tạo vòng lặp)');
+  }
+
+  /** Dữ liệu sơ đồ tổ chức: nhân viên đang làm việc, kèm quản lý trực tiếp */
+  orgChart() {
+    return this.repo
+      .createQueryBuilder('e')
+      .leftJoin('e.department', 'd')
+      .leftJoin('e.position', 'p')
+      .select(['e.id', 'e.code', 'e.fullName', 'e.avatarUrl', 'e.managerId', 'e.status', 'e.email'])
+      .addSelect(['d.id', 'd.name', 'p.id', 'p.name'])
+      .where('e.status != :s', { s: EmployeeStatus.RESIGNED })
+      .orderBy('e.fullName', 'ASC')
+      .getMany();
+  }
+
+  /**
+   * Ngày hết thử việc: ngày kết thúc HĐ thử việc gần nhất còn hiệu lực,
+   * nếu không có thì ngày vào làm + số tháng thử việc trong Cài đặt − 1 ngày
+   */
+  async probationEnd(emp: Employee): Promise<{ date: string; source: 'contract' | 'estimate' } | null> {
+    if (emp.status !== EmployeeStatus.PROBATION) return null;
+    const [c]: { endDate: string }[] = await this.repo.query(
+      `SELECT to_char(c."endDate", 'YYYY-MM-DD') AS "endDate" FROM contracts c JOIN contract_types t ON t.id = c."typeId"
+       WHERE c."employeeId" = $1 AND t."isProbation" = true AND c.status = 'ACTIVE' AND c."endDate" IS NOT NULL AND c."deletedAt" IS NULL
+       ORDER BY c."startDate" DESC LIMIT 1`,
+      [emp.id],
+    );
+    if (c) return { date: c.endDate, source: 'contract' };
+    if (!emp.hireDate) return null;
+    const months = this.settings.get('employee').probationMonths;
+    const d = new Date(`${emp.hireDate}T00:00:00Z`);
+    d.setUTCMonth(d.getUTCMonth() + months);
+    d.setUTCDate(d.getUTCDate() - 1);
+    return { date: d.toISOString().slice(0, 10), source: 'estimate' };
+  }
+
   async create(dto: CreateEmployeeDto) {
+    if (dto.managerId) await this.assertNoCycle('00000000-0000-0000-0000-000000000000', dto.managerId);
     await this.ensureUnique(dto.email, dto.code);
     const code = dto.code || (await this.generateCode());
     const customFields = await this.customFields.merge({}, dto.customFields ?? {}, { checkRequired: !!dto.customFields });
@@ -189,9 +238,7 @@ export class EmployeesService {
   }
 
   async update(id: string, dto: UpdateEmployeeDto, opts: { canSensitive?: boolean } = {}) {
-    if (dto.managerId && dto.managerId === id) {
-      throw new BadRequestException('Nhân viên không thể là quản lý của chính mình');
-    }
+    if (dto.managerId) await this.assertNoCycle(id, dto.managerId);
     const emp = await this.findOne(id);
     const defs = await this.customFields.findAll('EMPLOYEE');
     const before = await this.snapshot(emp, defs);

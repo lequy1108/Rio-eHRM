@@ -2,12 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { EmployeePicker } from '@/components/employee-picker';
 import { FormField } from '@/components/form-field';
+import { InviteResultsDialog, type InviteResult } from '@/components/invite-results';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -71,6 +74,10 @@ export function EmployeeFormDialog({
 }) {
   const qc = useQueryClient();
   const isEdit = !!employee;
+  const { can } = useAuth();
+  const canInvite = !isEdit && can('users.manage');
+  const [invite, setInvite] = useState(true);
+  const [results, setResults] = useState<InviteResult[] | null>(null);
   const { data: departments = [] } = useDepartmentOptions();
   const { data: positions = [] } = usePositionOptions();
 
@@ -100,8 +107,18 @@ export function EmployeeFormDialog({
         ? api<Employee>(`/employees/${employee!.id}`, { method: 'PATCH', body })
         : api<Employee>('/employees', { method: 'POST', body });
     },
-    onSuccess: (saved) => {
+    onSuccess: async (saved) => {
       toast.success(isEdit ? 'Đã cập nhật nhân viên' : `Đã thêm nhân viên ${saved.fullName} (${saved.code})`);
+      if (canInvite && invite && saved.email) {
+        // Hồ sơ đã lưu; lỗi tạo tài khoản chỉ báo riêng, không chặn
+        api<InviteResult[]>('/users/invite', { method: 'POST', body: { employeeIds: [saved.id] } })
+          .then(([r]) => {
+            qc.invalidateQueries({ queryKey: ['users'] });
+            if (r?.status === 'sent') toast.success(`Đã gửi email mời tới ${r.email}`);
+            else if (r) setResults([r]);
+          })
+          .catch((e: Error) => toast.error(`Chưa tạo được tài khoản: ${e.message}`));
+      }
       qc.invalidateQueries({ queryKey: ['employees'] });
       qc.invalidateQueries({ queryKey: ['departments'] });
       onOpenChange(false);
@@ -116,6 +133,8 @@ export function EmployeeFormDialog({
   });
 
   return (
+    <>
+    <InviteResultsDialog results={results} onClose={() => setResults(null)} />
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -213,6 +232,12 @@ export function EmployeeFormDialog({
         </DialogBody>
 
         <DialogFooter>
+          {canInvite && (
+            <label className="mr-auto flex cursor-pointer items-center gap-2 self-center text-sm">
+              <Checkbox checked={invite} onCheckedChange={(c) => setInvite(!!c)} />
+              Tạo tài khoản và gửi email mời
+            </label>
+          )}
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Huỷ
           </Button>
@@ -222,5 +247,6 @@ export function EmployeeFormDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
-import { KeyRound, Lock, LockOpen, MoreHorizontal, Pencil, Plus, Trash2, UserCog, X } from 'lucide-react';
+import { KeyRound, Lock, LockOpen, MailPlus, MoreHorizontal, Pencil, Plus, Send, Trash2, UserCog, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -12,6 +12,9 @@ import { DataTable } from '@/components/data-table/data-table';
 import { SearchInput } from '@/components/data-table/search-input';
 import { EmployeePicker } from '@/components/employee-picker';
 import { EmptyState } from '@/components/empty-state';
+import { InviteResultsDialog, type InviteResult } from '@/components/invite-results';
+import { Checkbox } from '@/components/ui/checkbox';
+import { CodeTag } from '@/components/code-tag';
 import { FormField } from '@/components/form-field';
 import { PageHeader } from '@/components/page-header';
 import { PasswordInput } from '@/components/password-input';
@@ -33,7 +36,7 @@ import { api, fileUrl } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { checkPassword, passwordHint, useBranding } from '@/lib/branding';
 import { useRoleOptions } from '@/lib/queries';
-import type { Paginated, User } from '@/lib/types';
+import type { Employee, Paginated, User } from '@/lib/types';
 import { useAuth } from '@/providers/auth-provider';
 import { useConfirm } from '@/providers/confirm-provider';
 
@@ -172,6 +175,103 @@ function ResetPasswordDialog({ user, onClose }: { user: User | null; onClose: ()
   );
 }
 
+/** Chọn nhân viên chưa có tài khoản để tạo tài khoản và gửi email mời đặt mật khẩu */
+function InviteDialog({ open, onOpenChange, onDone }: { open: boolean; onOpenChange: (o: boolean) => void; onDone: (r: InviteResult[]) => void }) {
+  const qc = useQueryClient();
+  const { data: roles = [] } = useRoleOptions();
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [roleId, setRoleId] = useState('');
+  const [search, setSearch] = useState('');
+  const { data: list = [], isLoading } = useQuery({
+    queryKey: ['users', 'invite-candidates'],
+    queryFn: () => api<Employee[]>('/users/invite-candidates'),
+    enabled: open,
+  });
+  useEffect(() => {
+    if (open) {
+      setPicked(new Set());
+      setSearch('');
+      setRoleId(roles.find((r) => r.code === 'EMPLOYEE')?.value ?? '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, roles.length]);
+  const shown = useMemo(() => {
+    const k = search.trim().toLowerCase();
+    return k ? list.filter((e) => `${e.fullName} ${e.code} ${e.email}`.toLowerCase().includes(k)) : list;
+  }, [list, search]);
+  const all = shown.length > 0 && shown.every((e) => picked.has(e.id));
+  const some = shown.some((e) => picked.has(e.id));
+  const send = useMutation({
+    mutationFn: () => api<InviteResult[]>('/users/invite', { method: 'POST', body: { employeeIds: [...picked], roleId: roleId || undefined } }),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ['users'] });
+      onOpenChange(false);
+      onDone(r);
+    },
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Mời nhân viên dùng hệ thống</DialogTitle>
+          <DialogDescription>Mỗi người nhận một email có link tự đặt mật khẩu, quản trị không cần biết mật khẩu của họ</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <SearchInput value={search} onChange={setSearch} placeholder="Tìm tên, mã, email…" />
+          <Select className="h-8 w-full sm:w-44" value={roleId} onChange={setRoleId} options={roles} placeholder="Vai trò" />
+        </div>
+        <DialogBody className="-mx-6 px-0">
+          {isLoading ? (
+            <p className="px-6 py-8 text-center text-sm text-muted-foreground">Đang tải…</p>
+          ) : list.length === 0 ? (
+            <EmptyState icon={UserCog} title="Mọi nhân viên đã có tài khoản" description="Chỉ hiện nhân viên chưa nghỉ việc, có email và chưa có tài khoản" />
+          ) : (
+            <div>
+              <label className="flex cursor-pointer items-center gap-3 border-b px-6 py-2 text-sm text-muted-foreground">
+                <Checkbox
+                  checked={all ? true : some ? 'indeterminate' : false}
+                  onCheckedChange={() => setPicked((p) => {
+                    const n = new Set(p);
+                    for (const e of shown) all ? n.delete(e.id) : n.add(e.id);
+                    return n;
+                  })}
+                />
+                Chọn tất cả <span className="font-mono tabular-nums">{shown.length}</span>
+              </label>
+              {shown.map((e) => (
+                <label key={e.id} className="flex cursor-pointer items-center gap-3 px-6 py-2 hover:bg-muted/50">
+                  <Checkbox
+                    checked={picked.has(e.id)}
+                    onCheckedChange={(c) => setPicked((p) => {
+                      const n = new Set(p);
+                      if (c) n.add(e.id); else n.delete(e.id);
+                      return n;
+                    })}
+                  />
+                  <Avatar name={e.fullName} src={fileUrl(e.avatarUrl)} className="size-7" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">{e.fullName}</div>
+                    <div className="truncate text-xs text-muted-foreground">{e.email}</div>
+                  </div>
+                  <CodeTag>{e.code}</CodeTag>
+                </label>
+              ))}
+            </div>
+          )}
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Huỷ
+          </Button>
+          <Button disabled={picked.size === 0} loading={send.isPending} onClick={() => send.mutate()}>
+            <Send /> Gửi lời mời{picked.size > 0 && <span className="font-mono tabular-nums">{picked.size}</span>}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function UsersPage() {
   const qc = useQueryClient();
   const confirm = useConfirm();
@@ -181,6 +281,8 @@ export default function UsersPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [resetting, setResetting] = useState<User | null>(null);
+  const [inviting, setInviting] = useState(false);
+  const [results, setResults] = useState<InviteResult[] | null>(null);
 
   const { data, isFetching } = useQuery({
     queryKey: ['users', 'list', q],
@@ -201,6 +303,13 @@ export default function UsersPage() {
     onSuccess: (_d, u) => {
       toast.success(`Đã mở khoá đăng nhập cho ${u.email}`);
       invalidate();
+    },
+  });
+  const resend = useMutation({
+    mutationFn: (u: User) => api<InviteResult>(`/users/${u.id}/resend-invite`, { method: 'POST' }),
+    onSuccess: (r) => {
+      if (r.status === 'sent') toast.success(`Đã gửi link đặt mật khẩu tới ${r.email}`);
+      else setResults([r]);
     },
   });
   const remove = useMutation({
@@ -244,6 +353,8 @@ export default function UsersPage() {
         cell: ({ row }) =>
           !row.original.isActive ? (
             <Badge variant="secondary"><Lock className="size-3" /> Đã khoá</Badge>
+          ) : row.original.mustSetPassword ? (
+            <Badge variant="outline">Chưa kích hoạt</Badge>
           ) : isLocked(row.original) ? (
             <Badge variant="warning">Tạm khoá đến <span className="font-mono tabular-nums">{hhmm(row.original.lockedUntil!)}</span></Badge>
           ) : (
@@ -268,8 +379,13 @@ export default function UsersPage() {
                 <DropdownMenuItem onClick={() => { setEditing(u); setOpen(true); }}>
                   <Pencil /> Sửa
                 </DropdownMenuItem>
+                {u.isActive && (
+                  <DropdownMenuItem onClick={() => resend.mutate(u)}>
+                    <Send /> {u.mustSetPassword ? 'Gửi lại lời mời' : 'Gửi link đặt mật khẩu'}
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setResetting(u)}>
-                  <KeyRound /> Đặt lại mật khẩu
+                  <KeyRound /> Đặt mật khẩu thủ công
                 </DropdownMenuItem>
                 {isLocked(u) && (
                   <DropdownMenuItem onClick={() => unlock.mutate(u)}>
@@ -300,7 +416,7 @@ export default function UsersPage() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [me?.id],
+    [me?.id, resend.isPending],
   );
 
   return (
@@ -309,7 +425,12 @@ export default function UsersPage() {
         title="Tài khoản"
         description="Người dùng đăng nhập hệ thống và vai trò của họ"
         breadcrumbs={[{ label: 'Hệ thống' }, { label: 'Tài khoản' }]}
-        actions={<Button onClick={() => { setEditing(null); setOpen(true); }}><Plus /> Tạo tài khoản</Button>}
+        actions={
+          <>
+            <Button variant="outline" onClick={() => setInviting(true)}><MailPlus /> Mời nhân viên</Button>
+            <Button onClick={() => { setEditing(null); setOpen(true); }}><Plus /> Tạo tài khoản</Button>
+          </>
+        }
       />
       <DataTable
         id="users"
@@ -341,6 +462,8 @@ export default function UsersPage() {
       />
       <UserDialog open={open} onOpenChange={setOpen} user={editing} />
       <ResetPasswordDialog user={resetting} onClose={() => setResetting(null)} />
+      <InviteDialog open={inviting} onOpenChange={setInviting} onDone={setResults} />
+      <InviteResultsDialog results={results} onClose={() => setResults(null)} />
     </>
   );
 }

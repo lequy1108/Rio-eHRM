@@ -73,14 +73,14 @@ Frontend, trải nghiệm người dùng
 - [x] [BE] CRUD tài khoản (chỉ ADMIN)
 - [x] [FE] ⭐ Trang hồ sơ cá nhân + đổi mật khẩu
 - [x] [FE] Trang quản lý tài khoản: tạo, khoá/mở, đổi vai trò, gắn với nhân viên, reset mật khẩu
-- [ ] [BE+FE] Quên mật khẩu qua email (link có hạn)
+- [x] [BE+FE] Quên mật khẩu qua email (link có hạn)
 - [ ] [BE] Refresh token + thu hồi phiên đăng nhập
-- [ ] [BE+FE] Tạo tài khoản tự động khi thêm nhân viên (gửi email mời đặt mật khẩu)
+- [x] [BE+FE] Tạo tài khoản tự động khi thêm nhân viên (gửi email mời đặt mật khẩu) _(kèm mời hàng loạt ở trang Tài khoản; chưa cấu hình email thì hiện link để chép)_
 - [x] [BE+FE] Phân quyền chi tiết theo chức năng (xem/thêm/sửa/xoá/duyệt/xuất), tự tạo vai trò mới
 - [ ] [BE] Phân quyền theo phạm vi dữ liệu: toàn công ty / chi nhánh / phòng ban mình / chỉ bản thân
 - [x] [BE+FE] Nhật ký hoạt động (audit log): ai, làm gì, lúc nào, dữ liệu trước và sau
 - [ ] [BE+FE] Cấu hình công ty: tên, logo, mã số thuế, địa chỉ, ngày công chuẩn _(đã có trang Cài đặt: công ty, giao diện, quy tắc nhân sự, email, bảo mật; còn ngày công chuẩn làm cùng Chấm công)_
-- [ ] [BE+FE] Danh mục ngày lễ theo năm
+- [x] [BE+FE] Danh mục ngày lễ theo năm _(Cài đặt → Ngày nghỉ lễ, tạo mặc định theo Điều 112 BLLĐ, Tết tính theo âm lịch)_
 - [x] [BE+FE] Danh mục dùng chung: dân tộc, tôn giáo, trình độ, ngân hàng, tỉnh/thành
 - [x] [BE+FE] Trang Cài đặt cho admin: tên, logo, favicon, màu chủ đạo, mã NV, thử việc, giờ nhắc, SMTP + gửi thử, chính sách mật khẩu, thời gian đăng nhập
 - [x] [BE+FE] Trường tuỳ chỉnh cho hồ sơ nhân viên (chữ, số, ngày, chọn một/nhiều, có/không; bắt buộc, cột danh sách, nhạy cảm; có trong Excel)
@@ -93,7 +93,7 @@ Frontend, trải nghiệm người dùng
 - [x] [BE+FE] Phòng ban dạng cây, trưởng phòng
 - [x] [BE+FE] Chức vụ, cấp bậc
 - [x] [FE] Chọn trưởng phòng trong form phòng ban
-- [ ] [FE] ⭐ Sơ đồ tổ chức trực quan (org chart): kéo thả, bấm vào để xem nhân viên
+- [x] [FE] ⭐ Sơ đồ tổ chức trực quan (org chart): kéo thả, bấm vào để xem nhân viên _(dạng cây thu gọn được, tìm kiếm; backend chặn vòng lặp quản lý)_
 - [ ] [BE+FE] Chi nhánh / văn phòng / công ty con
 - [ ] [BE+FE] Chức danh và ngạch bậc lương (gắn với khung lương ở giai đoạn 9)
 - [ ] [BE+FE] Định biên nhân sự theo phòng ban (kế hoạch so với thực tế)
@@ -118,7 +118,7 @@ Frontend, trải nghiệm người dùng
 - [x] [BE+FE] ⭐ Nhập nhân viên hàng loạt từ Excel
 - [x] [BE+FE] ⭐ Xuất danh sách nhân viên ra Excel theo bộ lọc
 - [ ] [FE] Xem danh sách dạng thẻ (card) hoặc dạng bảng
-- [ ] [BE] Tính tự động: tuổi, thâm niên, ngày hết thử việc _(tuổi và thâm niên đã hiển thị; số tháng thử việc đã có trong Cài đặt, ngày hết thử việc mới dùng trong email nhắc, chưa hiện trên hồ sơ)_
+- [x] [BE] Tính tự động: tuổi, thâm niên, ngày hết thử việc _(ngày hết thử việc lấy từ HĐ thử việc, không có thì ước tính theo Cài đặt)_
 - [x] [BE+FE] Lịch sinh nhật và kỷ niệm ngày vào làm _(thẻ 30 ngày tới trên bảng điều khiển)_
 
 ## 4. Hợp đồng lao động
